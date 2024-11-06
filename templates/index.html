@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h1 class="text-center">Speed Test</h1>
+
+    <form action="/download" method="POST" class="mt-4">
+        <div class="mb-3">
+            <label for="url" class="form-label">URL</label>
+            <input type="text" class="form-control" id="url" name="url" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="quality" class="form-label">Video Quality</label>
+            <select class="form-select" id="quality" name="quality">
+                <option value="bestvideo">Best Video</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="download_type" class="form-label">Download Type</label>
+            <select class="form-select" id="download_type" name="download_type">
+                <option value="video" selected>Video</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg w-100">Download</button>
+    </form>
+
+    <!-- Loader and Progress Bar -->
+    <div id="loader" class="d-none text-center mt-4">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Downloading... Please wait.</p>
+        <!-- <div class="progress">
+            <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div> -->
+    </div>
+</div>
+
+<script>
+    const socket = io.connect('http://' + document.domain + ':' + location.port);
+
+    socket.on('progress', function(data) {
+        let percentage = data.percentage;
+        document.getElementById('progress-bar').style.width = percentage + '%';
+        document.getElementById('progress-bar').setAttribute('aria-valuenow', percentage);
+        if (percentage >= 100) {
+            document.getElementById('loader').innerHTML = '<p>Download Complete!</p>';
+        }
+    });
+
+    const form = document.querySelector("form");
+    form.onsubmit = function() {
+        document.getElementById("loader").classList.remove("d-none");
+    };
+</script>
+
+</body>
+</html>
